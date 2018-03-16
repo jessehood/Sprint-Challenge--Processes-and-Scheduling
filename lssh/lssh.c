@@ -4,6 +4,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <errno.h>
 
 #define PROMPT "lambda-shell$ "
 
@@ -93,10 +94,11 @@ int main(void)
         }
 
         // Change directories if the "cd" command is entered
+        
         if (strcmp(args[0], "cd") == 0)
         {
-            chdir(args[1]);
-            continue;
+            if (chdir(args[1]) == 0) continue;
+            else perror("cd failed");
         }
 
         // Execute the desired command in a fork
