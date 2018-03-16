@@ -65,6 +65,8 @@ int main(void)
     // How many command line args the user typed
     int args_count;
 
+    int is_background_task = 0;
+
     // Shell loops forever (until we tell it to exit)
     while (1) {
         // Print a prompt
@@ -101,8 +103,15 @@ int main(void)
             else perror("cd failed");
         }
 
+        // Check for & symbol to determine if the task should be ran in the background
+        if (strcmp(args[args_count - 1], "&") == 0)
+        {
+            args[args_count - 1] = NULL;
+            is_background_task = 1;
+        }
+
         // Execute the desired command in a fork
-        // Wait for the fork to complete before continuing the main loop
+        // Wait for the fork to complete before continuing the main loop (if not a background task)
         int f = fork();
         if (f == 0) 
         {
@@ -111,7 +120,7 @@ int main(void)
         }
         else
         {
-            wait(NULL);
+            if (!is_background_task) wait(NULL);
         }
 
         #if DEBUG
