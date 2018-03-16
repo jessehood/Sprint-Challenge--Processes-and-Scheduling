@@ -67,6 +67,8 @@ int main(void)
 
     int is_background_task = 0;
 
+    FILE *file = NULL;
+
     // Shell loops forever (until we tell it to exit)
     while (1) {
         // Print a prompt
@@ -96,7 +98,6 @@ int main(void)
         }
 
         // Change directories if the "cd" command is entered
-        
         if (strcmp(args[0], "cd") == 0)
         {
             if (chdir(args[1]) == 0) continue;
@@ -110,10 +111,21 @@ int main(void)
             is_background_task = 1;
         }
 
+        //Redirect output to a file
+        if (args[args_count - 2] != NULL && strcmp(args[args_count - 2], ">") == 0)
+        {
+            if (fork() == 0)
+            {
+                file = freopen(args[args_count - 1], "a+", stdout);
+            }
+
+            args[args_count - 2] = NULL;
+            args[args_count - 1] = NULL;
+        }
+
         // Execute the desired command in a fork
         // Wait for the fork to complete before continuing the main loop (if not a background task)
-        int f = fork();
-        if (f == 0) 
+        if (fork() == 0) 
         {
             execvp(args[0], &args[0]);
             break;
@@ -121,6 +133,10 @@ int main(void)
         else
         {
             if (!is_background_task) wait(NULL);
+
+            // reset stdout from file redirection
+            freopen("/dev/tty", "w", stdout);
+            if (file != NULL) fclose(file);
         }
 
         #if DEBUG
