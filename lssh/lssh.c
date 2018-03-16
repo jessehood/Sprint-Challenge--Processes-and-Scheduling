@@ -86,6 +86,12 @@ int main(void)
             continue;
         }
 
+
+        // Exit the shell if args[0] is the built-in "exit" command
+        if (strcmp(args[0], "exit") == 0) {
+            break;
+        }
+
         // Execute the desired command in a fork
         // Wait for the fork to complete before continuing the main loop
         int f = fork();
@@ -98,12 +104,7 @@ int main(void)
         {
             wait(NULL);
         }
-
-        // Exit the shell if args[0] is the built-in "exit" command
-        if (strcmp(args[0], "exit") == 0) {
-            break;
-        }
-
+        
         #if DEBUG
 
         // Some debugging output
