@@ -2,12 +2,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #define PROMPT "lambda-shell$ "
 
 #define MAX_TOKENS 100
 #define COMMANDLINE_BUFSIZE 1024
-#define DEBUG 1  // Set to 1 to turn on some debugging output, or 0 to turn off
+#define DEBUG 0  // Set to 1 to turn on some debugging output, or 0 to turn off
 
 /**
  * Parse the command line.
@@ -82,6 +84,19 @@ int main(void)
         if (args_count == 0) {
             // If the user entered no commands, do nothing
             continue;
+        }
+
+        // Execute the desired command in a fork
+        // Wait for the fork to complete before continuing the main loop
+        int f = fork();
+        if (f == 0) 
+        {
+            execvp(args[0], &args[0]);
+            break;
+        }
+        else
+        {
+            wait(NULL);
         }
 
         // Exit the shell if args[0] is the built-in "exit" command
