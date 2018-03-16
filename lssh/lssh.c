@@ -92,6 +92,13 @@ int main(void)
             break;
         }
 
+        // Change directories if the "cd" command is entered
+        if (strcmp(args[0], "cd") == 0)
+        {
+            chdir(args[1]);
+            continue;
+        }
+
         // Execute the desired command in a fork
         // Wait for the fork to complete before continuing the main loop
         int f = fork();
@@ -104,7 +111,7 @@ int main(void)
         {
             wait(NULL);
         }
-        
+
         #if DEBUG
 
         // Some debugging output
